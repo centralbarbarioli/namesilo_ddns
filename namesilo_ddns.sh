@@ -44,17 +44,39 @@ get_random()
 	expr $(echo | awk "{srand; print int(rand * $max)}") + $add
 }
 
+get_ip()
+{
+  record_type=$1
+  addr=$2
+  resolver=$3
+
+  case $DNSUTIL in
+  dig)
+    dig $record_type +short $addr @$resolver
+    ;;
+  drill)
+    drill $record_type $addr @$resolver | \
+      sed -ne "/^$addr/s/.*[[:space:]]\"*\([0-9.]*\)\"*/\1/p"
+    ;;
+  esac
+}
+
+if type drill > /dev/null; then
+  DNSUTIL=drill
+else
+  DNSUTIL=dig
+fi
+
 deps_missing=0
-for d in dig curl xmllint; do
+for d in $DNSUTIL curl xmllint; do
   if ! type $d > /dev/null; then
-    echo "You need to make sure the $d utility is available"
+    echo "You need to make sure the $d utility is available, see README"
     deps_missing=1
   fi
 done
 if [ "$deps_missing" = 1 ]; then
   exit 1
 fi
-
 
 ##Saved history pubic IP from last check
 IP_FILE="/var/tmp/MyPubIP"
@@ -71,7 +93,7 @@ RESPONSE="/tmp/namesilo_response.xml"
 ##Choose randomly which OpenDNS resolver to use
 RESOLVER=resolver$(get_random 4 1).opendns.com
 ##Get the current public IP using DNS
-CUR_IP="$(dig +short myip.opendns.com @$RESOLVER)"
+CUR_IP="$(get_ip a myip.opendns.com $RESOLVER)"
 ODRC=$?
 
 ## Try google dns if opendns failed
@@ -81,7 +103,7 @@ if [ $ODRC -ne 0 ]; then
 ##Choose randomly which Google resolver to use
    RESOLVER=ns$(get_random 4 1).google.com
 ##Get the current public IP 
-   IPQUOTED=$(dig TXT +short o-o.myaddr.l.google.com @$RESOLVER)
+   IPQUOTED=$(get_ip TXT o-o.myaddr.l.google.com $RESOLVER)
    GORC=$?
 ## Exit if google failed
    if [ $GORC -ne 0 ]; then

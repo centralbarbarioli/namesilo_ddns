@@ -13,7 +13,7 @@ Please report test results.
 
 * Generate API key in the _api manager_ at Namesilo
 
-* Make sure your system have command `dig` and `xmllint`. If not, install them:
+* Make sure your system have command `dig` or `drill` and `xmllint`. If not, install them:
 
 on CentOS:
 
@@ -25,7 +25,7 @@ on Ubuntu/Debian:
 
 on FreeBSD:
 
-```sudo pkg install bind910 libxml2```
+```sudo pkg install libxml2```
 
 ## How to use:
 * Download and save the shell script.
