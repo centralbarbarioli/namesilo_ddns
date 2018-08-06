@@ -44,6 +44,18 @@ get_random()
 	expr $(echo | awk "{srand; print int(rand * $max)}") + $add
 }
 
+deps_missing=0
+for d in dig curl xmllint; do
+  if ! type $d > /dev/null; then
+    echo "You need to make sure the $d utility is available"
+    deps_missing=1
+  fi
+done
+if [ "$deps_missing" = 1 ]; then
+  exit 1
+fi
+
+
 ##Saved history pubic IP from last check
 IP_FILE="/var/tmp/MyPubIP"
 
