@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ##Domain name:
 DOMAIN="mydomain.tld"
@@ -10,6 +10,14 @@ HOST="subdomain."
 APIKEY="c40031261ee449037a4b4"
 
 ## Do not edit lines below ##
+
+get_random()
+{
+	max=$1
+	add=${2-0}
+
+	expr $(echo | awk "{srand; print int(rand * $max)}") + $add
+}
 
 ##Saved history pubic IP from last check
 IP_FILE="/var/tmp/MyPubIP"
@@ -24,7 +32,7 @@ NO_IP_CHANGE_TIME=86400
 RESPONSE="/tmp/namesilo_response.xml"
 
 ##Choose randomly which OpenDNS resolver to use
-RESOLVER=resolver$(echo $((($RANDOM%4)+1))).opendns.com
+RESOLVER=resolver$(get_random 4 1).opendns.com
 ##Get the current public IP using DNS
 CUR_IP="$(dig +short myip.opendns.com @$RESOLVER)"
 ODRC=$?
@@ -34,7 +42,7 @@ if [ $ODRC -ne 0 ]; then
    logger -t IP.Check -- IP Lookup at $RESOLVER failed!
    sleep 5
 ##Choose randomly which Google resolver to use
-   RESOLVER=ns$(echo $((($RANDOM%4)+1))).google.com
+   RESOLVER=ns$(get_random 4 1).google.com
 ##Get the current public IP 
    IPQUOTED=$(dig TXT +short o-o.myaddr.l.google.com @$RESOLVER)
    GORC=$?
@@ -60,7 +68,9 @@ if [ "$CUR_IP" != "$KNOWN_IP" ]; then
 
   ##Update DNS record in Namesilo:
   curl -s "https://www.namesilo.com/api/dnsListRecords?version=1&type=xml&key=$APIKEY&domain=$DOMAIN" > $DOMAIN.xml 
-  RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST$DOMAIN' ]" $DOMAIN.xml | grep -oP '(?<=<record_id>).*?(?=</record_id>)'`
+  RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST$DOMAIN' ]" $DOMAIN.xml`
+  RECORD_ID=${RECORD_ID#*>}
+  RECORD_ID=${RECORD_ID%<*}
   curl -s "https://www.namesilo.com/api/dnsUpdateRecord?version=1&type=xml&key=$APIKEY&domain=$DOMAIN&rrid=$RECORD_ID&rrhost=$HOST&rrvalue=$CUR_IP&rrttl=3600" > $RESPONSE
     RESPONSE_CODE=`xmllint --xpath "//namesilo/reply/code/text()"  $RESPONSE`
        case $RESPONSE_CODE in
@@ -77,9 +87,11 @@ if [ "$CUR_IP" != "$KNOWN_IP" ]; then
 
 else
   ## Only log all these events NO_IP_CHANGE_TIME after last update
-  [ $(date "+%s") -gt $((($(cat $IP_TIME)+$NO_IP_CHANGE_TIME))) ] &&
-    logger -t IP.Check -- NO IP change from $RESOLVER &&
+  if [ $(date "+%s") -gt \
+		$(expr "$(cat $IP_TIME)" + "$NO_IP_CHANGE_TIME") ]; then
+    logger -t IP.Check -- NO IP change from $RESOLVER
     date "+%s" > $IP_TIME
+  fi
 fi
 
 exit 0
