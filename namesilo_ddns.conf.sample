@@ -1,0 +1,12 @@
+##Call the utility with this filename as an argument
+
+##Domain name:
+DOMAIN="mydomain.tld"
+
+##Host names (subdomains). Space separated list.
+##Use @ if you need to include the domain in the list
+HOSTS="@ www subdomain"
+
+##APIKEY obtained from Namesilo:
+APIKEY="c40031261ee449037a4b4"
+

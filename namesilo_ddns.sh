@@ -1,5 +1,10 @@
 #!/bin/sh
 
+##For security, you should really use a config file readable only by the user
+##calling this utility (root may not be such a great idea).  There is an example
+##provided.  Give the filename as an argument.
+##Otherwise, set the variables here:
+
 ##Domain name:
 DOMAIN="mydomain.tld"
 
@@ -11,6 +16,19 @@ HOSTS="@ www subdomain"
 APIKEY="c40031261ee449037a4b4"
 
 ## Do not edit lines below ##
+
+usage="Usage: $0 [conf-file]"
+if [ $# = 1 ]; then
+  if grep -q ^APIKEY= $1 2>/dev/null; then
+    . $1
+  else
+    echo $usage
+    exit 1
+  fi
+elif [ $# -gt 1 ]; then
+    echo $usage
+    exit 1
+fi
 
 set -- $HOSTS
 
