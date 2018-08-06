@@ -3,13 +3,16 @@
 ##Domain name:
 DOMAIN="mydomain.tld"
 
-##Host name (subdomain). Optional. If present, must end with a dot (.)
-HOST="subdomain."
+##Host names (subdomains). Space separated list.
+##Use @ if you need to include the domain in the list
+HOSTS="@ www subdomain"
 
 ##APIKEY obtained from Namesilo:
 APIKEY="c40031261ee449037a4b4"
 
 ## Do not edit lines below ##
+
+set -- $HOSTS
 
 get_random()
 {
@@ -63,6 +66,12 @@ fi
 
 ##See if the IP has changed
 if [ "$CUR_IP" != "$KNOWN_IP" ]; then
+  while [ $# -gt 0 ]; do
+    # @ is the bare domain.  Dots are not required, but handle correctly in
+    # case the user puts them in anyway.
+    HOST=${1%@}
+    HOST=${HOST%.}
+    HOST="${HOST:+$HOST.}"
     echo $CUR_IP > $IP_FILE
     logger -t IP.Check -- Public IP changed to $CUR_IP from $RESOLVER
 
@@ -88,6 +97,8 @@ if [ "$CUR_IP" != "$KNOWN_IP" ]; then
       ;;
     esac
 
+    shift
+  done
 else
   ## Only log all these events NO_IP_CHANGE_TIME after last update
   if [ $(date "+%s") -gt \
