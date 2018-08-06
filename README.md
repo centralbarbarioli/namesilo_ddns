@@ -51,7 +51,7 @@ Step 3: Verify:
 
 ```dig +short test.domain.tld @ns1.dnsowl.com```
 
-(you may also try other DNS server at Namesilo, e.g. `ns2.dnsowl.com`, `ns3.dnsowl.c)
+(you may also try other DNS server at Namesilo, e.g. `ns2.dnsowl.com`, `ns3.dnsowl.com`)
 
 The result should show updated DNS record with your current public IP address. 
 (Note: DNS record update need time to propagate to other DNS server, so if your check against other DNS server you may not see the update right away.)
