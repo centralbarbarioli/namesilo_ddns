@@ -11,7 +11,7 @@ Please report test results.
 
 ## Prerequisites:
 
-* Generate API key in the “api manager” at Namesilo
+* Generate API key in the _api manager_ at Namesilo
 
 * Make sure your system have command `dig` and `xmllint`. If not, install them:
 
@@ -24,11 +24,15 @@ on Ubuntu/Debian:
 ```sudo apt-get install dnsutils libxml2-utils```
 
 on FreeBSD:
+
 ```sudo pkg install bind910 libxml2```
 
 ## How to use:
 * Download and save the shell script.
-* Modify the script, set “DOMAIN”, “HOST”, and “APIKEY” at the beginning of the script.
+* Either
+  * Modify the script, set `DOMAIN`, `HOSTS`, and `APIKEY` at the beginning of the script.  You may optionally change the `TTL`.
+* or
+  * Copy namesilo_ddns.conf.sample somewhere, chmod 600 and add the above details to it.
 * Set file permission to make it executable.
 * Create cronjob (optional)
 
@@ -41,11 +45,13 @@ Step 1: Create an A record in DNS Manager at Namesilo. Set it to a random IP add
 
 Step 2: Run the script to try to update this DNS record
 
+```# ./namesilo_ddns.sh [/path/to/optional_config_file]```
+
 Step 3: Verify:
 
 ```dig +short test.domain.tld @ns1.dnsowl.com```
 
-(you may also try other DNS server at Namesilo, e.g. `ns2.dnsowl.com`， `ns3.dnsowl.com` )
+(you may also try other DNS server at Namesilo, e.g. `ns2.dnsowl.com`, `ns3.dnsowl.c)
 
 The result should show updated DNS record with your current public IP address. 
 (Note: DNS record update need time to propagate to other DNS server, so if your check against other DNS server you may not see the update right away.)
