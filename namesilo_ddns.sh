@@ -63,27 +63,30 @@ fi
 
 ##See if the IP has changed
 if [ "$CUR_IP" != "$KNOWN_IP" ]; then
-  echo $CUR_IP > $IP_FILE
-  logger -t IP.Check -- Public IP changed to $CUR_IP from $RESOLVER
+    echo $CUR_IP > $IP_FILE
+    logger -t IP.Check -- Public IP changed to $CUR_IP from $RESOLVER
 
-  ##Update DNS record in Namesilo:
-  curl -s "https://www.namesilo.com/api/dnsListRecords?version=1&type=xml&key=$APIKEY&domain=$DOMAIN" > /tmp/$DOMAIN.xml
-  RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST$DOMAIN' ]" /tmp/$DOMAIN.xml`
-  RECORD_ID=${RECORD_ID#*>}
-  RECORD_ID=${RECORD_ID%<*}
-  curl -s "https://www.namesilo.com/api/dnsUpdateRecord?version=1&type=xml&key=$APIKEY&domain=$DOMAIN&rrid=$RECORD_ID&rrhost=$HOST&rrvalue=$CUR_IP&rrttl=3600" > $RESPONSE
+    ##Update DNS record in Namesilo:
+    curl -s "https://www.namesilo.com/api/dnsListRecords?version=1&type=xml&key=$APIKEY&domain=$DOMAIN" > /tmp/$DOMAIN.xml
+    RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST$DOMAIN' ]" /tmp/$DOMAIN.xml`
+    RECORD_ID=${RECORD_ID#*>}
+    RECORD_ID=${RECORD_ID%<*}
+    curl -s "https://www.namesilo.com/api/dnsUpdateRecord?version=1&type=xml&key=$APIKEY&domain=$DOMAIN&rrid=$RECORD_ID&rrhost=$HOST&rrvalue=$CUR_IP&rrttl=3600" > $RESPONSE
     RESPONSE_CODE=`xmllint --xpath "//namesilo/reply/code/text()"  $RESPONSE`
-       case $RESPONSE_CODE in
-       300)
-         date "+%s" > $IP_TIME
-         logger -t IP.Check -- Update success. Now $HOST$DOMAIN IP address is $CUR_IP;;
-       280)
-         logger -t IP.Check -- Duplicate record exists. No update necessary;;
-       *)
-         ## put the old IP back, so that the update will be tried next time
-         echo $KNOWN_IP > $IP_FILE
-         logger -t IP.Check -- DDNS update failed code $RESPONSE_CODE!;;
-     esac
+    case $RESPONSE_CODE in
+    300)
+      date "+%s" > $IP_TIME
+      logger -t IP.Check -- Update success. Now $HOST$DOMAIN IP address is $CUR_IP
+      ;;
+    280)
+      logger -t IP.Check -- Duplicate record exists. No update necessary
+      ;;
+    *)
+      ## put the old IP back, so that the update will be tried next time
+      echo $KNOWN_IP > $IP_FILE
+      logger -t IP.Check -- DDNS update failed code $RESPONSE_CODE!
+      ;;
+    esac
 
 else
   ## Only log all these events NO_IP_CHANGE_TIME after last update
