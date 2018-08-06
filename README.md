@@ -1,13 +1,13 @@
-# Announcement (2017-12-21)
-I no longer use Namesilo's DNS service so I cannot help any issue for this script.
-
 -----------------------------------------------------------------
 # namesilo_ddns
-Dynamic DNS record update with NameSilo. 
+Dynamic DNS record update with NameSilo.
 
-This is a Bash script to update Namesilo's DNS record when IP changed. Set to run this script as cronjob in your system.
+This is a shell script to update Namesilo's DNS record when IP changed. Set to run this script as cronjob in your system.
 
-Tested in Fedora 23, CentOS 7 and Ubuntu 14.04+.
+Previous version tested in Fedora 23, CentOS 7 and Ubuntu 14.04+.
+
+Portablity fixes mean it should work anywhere, but definitely works on FreeBSD.
+Please report test results.
 
 ## Prerequisites:
 
@@ -18,19 +18,22 @@ Tested in Fedora 23, CentOS 7 and Ubuntu 14.04+.
 on CentOS:
 
 ```sudo yum install bind-utils libxml2```
-    
+
 on Ubuntu/Debian:
 
 ```sudo apt-get install dnsutils libxml2-utils```
 
+on FreeBSD:
+```sudo pkg install bind910 libxml2```
+
 ## How to use:
-* Download and save the Bash script.
+* Download and save the shell script.
 * Modify the script, set “DOMAIN”, “HOST”, and “APIKEY” at the beginning of the script.
 * Set file permission to make it executable.
 * Create cronjob (optional)
 
 ## Manual test:
-You should test the script to verify that actually can update the DNS record at Namesilo. 
+You should test the script to verify that actually can update the DNS record at Namesilo.
 
 Step 1: Create an A record in DNS Manager at Namesilo. Set it to a random IP address (not the same public IP of yours). For example:
 
