@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# namesilo_ddns version 2.0
+
 ##For security, you should really use a config file readable only by the user
 ##calling this utility (root may not be such a great idea).  There is an example
 ##provided.  Give the filename as an argument.
