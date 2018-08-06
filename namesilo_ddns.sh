@@ -105,13 +105,13 @@ if [ "$CUR_IP" != "$KNOWN_IP" ]; then
     # case the user puts them in anyway.
     HOST=${1%@}
     HOST=${HOST%.}
-    HOST="${HOST:+$HOST.}"
+    HOST_DOT="${HOST:+$HOST.}"
     echo $CUR_IP > $IP_FILE
     logger -t IP.Check -- Public IP changed to $CUR_IP from $RESOLVER
 
     ##Update DNS record in Namesilo:
     curl -s "https://www.namesilo.com/api/dnsListRecords?version=1&type=xml&key=$APIKEY&domain=$DOMAIN" > /tmp/$DOMAIN.xml
-    RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST$DOMAIN' ]" /tmp/$DOMAIN.xml`
+    RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST_DOT$DOMAIN' ]" /tmp/$DOMAIN.xml`
     RECORD_ID=${RECORD_ID#*>}
     RECORD_ID=${RECORD_ID%<*}
     curl -s "https://www.namesilo.com/api/dnsUpdateRecord?version=1&type=xml&key=$APIKEY&domain=$DOMAIN&rrid=$RECORD_ID&rrhost=$HOST&rrvalue=$CUR_IP&rrttl=$TTL" > $RESPONSE
@@ -120,7 +120,7 @@ if [ "$CUR_IP" != "$KNOWN_IP" ]; then
     300)
       ## Really doesn't matter if this is shared.
       date "+%s" > $IP_TIME
-      logger -t IP.Check -- Update success. Now $HOST$DOMAIN IP address is $CUR_IP
+      logger -t IP.Check -- Update success. Now $HOST_DOT$DOMAIN IP address is $CUR_IP
       ;;
     280)
       logger -t IP.Check -- Duplicate record exists. No update necessary
