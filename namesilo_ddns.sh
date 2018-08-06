@@ -118,6 +118,7 @@ if [ "$CUR_IP" != "$KNOWN_IP" ]; then
     RESPONSE_CODE=`xmllint --xpath "//namesilo/reply/code/text()"  $RESPONSE`
     case $RESPONSE_CODE in
     300)
+      ## Really doesn't matter if this is shared.
       date "+%s" > $IP_TIME
       logger -t IP.Check -- Update success. Now $HOST$DOMAIN IP address is $CUR_IP
       ;;
