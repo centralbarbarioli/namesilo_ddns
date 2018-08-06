@@ -67,8 +67,8 @@ if [ "$CUR_IP" != "$KNOWN_IP" ]; then
   logger -t IP.Check -- Public IP changed to $CUR_IP from $RESOLVER
 
   ##Update DNS record in Namesilo:
-  curl -s "https://www.namesilo.com/api/dnsListRecords?version=1&type=xml&key=$APIKEY&domain=$DOMAIN" > $DOMAIN.xml 
-  RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST$DOMAIN' ]" $DOMAIN.xml`
+  curl -s "https://www.namesilo.com/api/dnsListRecords?version=1&type=xml&key=$APIKEY&domain=$DOMAIN" > /tmp/$DOMAIN.xml
+  RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST$DOMAIN' ]" /tmp/$DOMAIN.xml`
   RECORD_ID=${RECORD_ID#*>}
   RECORD_ID=${RECORD_ID%<*}
   curl -s "https://www.namesilo.com/api/dnsUpdateRecord?version=1&type=xml&key=$APIKEY&domain=$DOMAIN&rrid=$RECORD_ID&rrhost=$HOST&rrvalue=$CUR_IP&rrttl=3600" > $RESPONSE
