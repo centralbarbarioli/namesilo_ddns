@@ -69,8 +69,14 @@ else
   DNSUTIL=dig
 fi
 
+if type fetch > /dev/null; then
+  CURL="fetch -qo -"
+else
+  CURL="curl -s"
+fi
+
 deps_missing=0
-for d in $DNSUTIL curl xmllint; do
+for d in $DNSUTIL ${CURL%% *} xmllint; do
   if ! type $d > /dev/null; then
     echo "You need to make sure the $d utility is available, see README"
     deps_missing=1
@@ -134,11 +140,11 @@ if [ "$CUR_IP" != "$KNOWN_IP" ]; then
     logger -t IP.Check -- Public IP changed to $CUR_IP from $RESOLVER
 
     ##Update DNS record in Namesilo:
-    curl -s "https://www.namesilo.com/api/dnsListRecords?version=1&type=xml&key=$APIKEY&domain=$DOMAIN" > /tmp/$DOMAIN.xml
+    $CURL "https://www.namesilo.com/api/dnsListRecords?version=1&type=xml&key=$APIKEY&domain=$DOMAIN" > /tmp/$DOMAIN.xml
     RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST_DOT$DOMAIN' ]" /tmp/$DOMAIN.xml`
     RECORD_ID=${RECORD_ID#*>}
     RECORD_ID=${RECORD_ID%<*}
-    curl -s "https://www.namesilo.com/api/dnsUpdateRecord?version=1&type=xml&key=$APIKEY&domain=$DOMAIN&rrid=$RECORD_ID&rrhost=$HOST&rrvalue=$CUR_IP&rrttl=$TTL" > $RESPONSE
+    $CURL "https://www.namesilo.com/api/dnsUpdateRecord?version=1&type=xml&key=$APIKEY&domain=$DOMAIN&rrid=$RECORD_ID&rrhost=$HOST&rrvalue=$CUR_IP&rrttl=$TTL" > $RESPONSE
     RESPONSE_CODE=`xmllint --xpath "//namesilo/reply/code/text()"  $RESPONSE`
     case $RESPONSE_CODE in
     300)
