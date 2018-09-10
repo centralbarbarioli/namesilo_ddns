@@ -2,28 +2,11 @@
 
 # namesilo_ddns version 2.0
 
-##For security, you should really use a config file readable only by the user
+##For security, you should use a config file readable only by the user
 ##calling this utility (root may not be such a great idea).  There is an example
 ##provided.  Give the filename as an argument.
-##Otherwise, set the variables here:
 
-##Domain name:
-DOMAIN="mydomain.tld"
-
-##Host names (subdomains). Space separated list.
-##Use @ if you need to include the domain in the list
-HOSTS="@ www subdomain"
-
-##APIKEY obtained from Namesilo:
-APIKEY="c40031261ee449037a4b4"
-
-##TTL can be anything down to 3600, but 3603 allows them to use anti-DoSing
-##and is recommended
-TTL=3603
-
-## Do not edit lines below ##
-
-usage="Usage: $0 [conf-file]"
+usage="Usage: $0 conf-file"
 if [ $# = 1 ]; then
   if grep -q ^APIKEY= $1 2>/dev/null; then
     . $1
@@ -31,7 +14,7 @@ if [ $# = 1 ]; then
     echo $usage
     exit 1
   fi
-elif [ $# -gt 1 ]; then
+else
     echo $usage
     exit 1
 fi
