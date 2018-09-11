@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# namesilo_ddns version 2.0
+# namesilo_ddns version 2.2
 
 ##For security, you should use a config file readable only by the user
 ##calling this utility (root may not be such a great idea).  There is an example
@@ -124,7 +124,7 @@ if [ "$CUR_IP" != "$KNOWN_IP" ]; then
 
     ##Update DNS record in Namesilo:
     $CURL "https://www.namesilo.com/api/dnsListRecords?version=1&type=xml&key=$APIKEY&domain=$DOMAIN" > /tmp/$DOMAIN.xml
-    RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST_DOT$DOMAIN' ]" /tmp/$DOMAIN.xml`
+    RECORD_ID=`xmllint --xpath "//namesilo/reply/resource_record/record_id[../host/text() = '$HOST_DOT$DOMAIN' ][../type = 'A' ]" /tmp/$DOMAIN.xml`
     RECORD_ID=${RECORD_ID#*>}
     RECORD_ID=${RECORD_ID%<*}
     $CURL "https://www.namesilo.com/api/dnsUpdateRecord?version=1&type=xml&key=$APIKEY&domain=$DOMAIN&rrid=$RECORD_ID&rrhost=$HOST&rrvalue=$CUR_IP&rrttl=$TTL" > $RESPONSE
