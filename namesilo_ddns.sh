@@ -70,16 +70,16 @@ if [ "$deps_missing" = 1 ]; then
 fi
 
 ##Saved history pubic IP from last check
-IP_FILE="/var/tmp/MyPubIP"
+IP_FILE="/var/tmp/MyPubIP-$DOMAIN"
 
 ##Time IP last updated or 'No IP change' log message output
-IP_TIME="/var/tmp/MyIPTime"
+IP_TIME="/var/tmp/MyIPTime-$DOMAIN"
 
 ##How often to output 'No IP change' log messages
 NO_IP_CHANGE_TIME=86400
 
 ##Response from Namesilo
-RESPONSE="/tmp/namesilo_response.xml"
+RESPONSE="/tmp/namesilo_response-$DOMAIN.xml"
 
 ##Choose randomly which OpenDNS resolver to use
 RESOLVER=resolver$(get_random 4 1).opendns.com
