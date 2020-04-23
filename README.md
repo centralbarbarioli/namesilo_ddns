@@ -2,9 +2,9 @@
 # namesilo_ddns version 2.2
 Dynamic DNS record update with NameSilo.
 
-This is a shell script to update Namesilo's DNS record when IP changed. Set to run this script as cronjob in your system.
+This is a shell script to update Namesilo's DNS record when IP changed.  Set to run this script as cronjob in your system.
 
-Previous version tested in Fedora 23, CentOS 7 and Ubuntu 14.04+.
+Previous version was tested in Fedora 23, CentOS 7 and Ubuntu 14.04+.
 
 Portablity fixes mean it should work anywhere, but definitely works on FreeBSD.
 Please report test results.
@@ -13,7 +13,7 @@ Please report test results.
 
 * Generate API key in the _api manager_ at Namesilo
 
-* Make sure your system have command `dig` or `drill` and `xmllint`. If not, install them:
+* Make sure your system has `xmllint` and `dig` or `drill`.  Your system will also require `cURL` or `fetch`.  If not, install them:
 
 on CentOS:
 
@@ -29,11 +29,8 @@ on FreeBSD:
 
 ## How to use:
 * Download and save the shell script.
-* Either
-  * Modify the script, set `DOMAIN`, `HOSTS`, and `APIKEY` at the beginning of the script.  You may optionally change the `TTL`.
-* or
-  * Copy namesilo_ddns.conf.sample somewhere, chmod 600 and add the above details to it.
-* Set file permission to make it executable.
+* Copy namesilo_ddns.conf.sample somewhere, chmod 600 and set `DOMAIN`, `HOSTS`, and `APIKEY`.  You may optionally change the `TTL`.
+* Set file permission to make the script executable.
 * Create cronjob (optional)
 
 ## Manual test:
@@ -45,7 +42,7 @@ Step 1: Create an A record in DNS Manager at Namesilo. Set it to a random IP add
 
 Step 2: Run the script to try to update this DNS record
 
-```# ./namesilo_ddns.sh [/path/to/optional_config_file]```
+```# ./namesilo_ddns.sh /path/to/config_file```
 
 Step 3: Verify:
 
@@ -54,4 +51,4 @@ Step 3: Verify:
 (you may also try other DNS server at Namesilo, e.g. `ns2.dnsowl.com`, `ns3.dnsowl.com`)
 
 The result should show updated DNS record with your current public IP address. 
-(Note: DNS record update need time to propagate to other DNS server, so if your check against other DNS server you may not see the update right away.)
+(Note: DNS record updates need time to propagate to other DNS server, so if you check against other DNS server you may not see the update right away.)
