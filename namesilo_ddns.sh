@@ -26,7 +26,7 @@ get_random()
 	max=$1
 	add=${2-0}
 
-	expr $(echo | awk "{srand; print int(rand * $max)}") + $add
+	expr $(echo | awk "{srand(); print int(rand() * $max)}") + $add
 }
 
 get_ip()
