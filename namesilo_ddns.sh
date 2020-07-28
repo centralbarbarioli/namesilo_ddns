@@ -19,6 +19,7 @@ else
     exit 1
 fi
 
+set -f
 set -- $HOSTS
 
 get_random()
